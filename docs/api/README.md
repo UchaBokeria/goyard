@@ -27,7 +27,7 @@ The `pkg` package contains the core utilities and components of the framework.
 The Controller provides enhanced request handling with an extended context.
 
 ```go
-import "github.com/yourorg/goyard/pkg"
+import "github.com/UchaBokeria/goyard/pkg"
 
 // Use controller in your handler
 handler := pkg.Use(func(ctx *pkg.Context) error {

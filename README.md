@@ -16,7 +16,7 @@ A comprehensive Go web framework toolkit providing essential components for web 
 ## Installation
 
 ```bash
-go get github.com/yourorg/goyard
+go get "github.com/UchaBokeria/goyard
 ```
 
 ## Usage
@@ -25,7 +25,7 @@ go get github.com/yourorg/goyard
 package main
 
 import (
-    "github.com/yourorg/goyard/pkg"
+    ""github.com/UchaBokeria/goyard/pkg"
 )
 
 func main() {
@@ -35,7 +35,7 @@ func main() {
 
 ## Documentation
 
-For more details, see the [full documentation](https://github.com/yourorg/goyard).
+For more details, see the [full documentation](https://"github.com/UchaBokeria/goyard).
 
 ## License
 

@@ -2,8 +2,9 @@
 package goyard
 
 import (
+	"github.com/UchaBokeria/goyard/controller"
+	"github.com/UchaBokeria/goyard/types"
 	"github.com/labstack/echo/v4"
-	"github.com/yourorg/goyard/controller"
 )
 
 // Version represents the current version of the goyard framework
@@ -18,6 +19,12 @@ const Version = "0.1.0"
 //
 //	e := echo.New()
 //	e.Use(goyard.New())
-func New() echo.MiddlewareFunc {
-	return controller.Initialize()
+func New() *types.Goyard {
+	echo := echo.New()
+	echo.Use(controller.Initialize())
+	return &types.Goyard{Echo: *echo}
+}
+
+func Use(echo *types.Goyard) {
+	echo.Use(controller.Initialize())
 }

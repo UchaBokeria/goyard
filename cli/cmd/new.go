@@ -53,7 +53,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/yourorg/goyard"
+	"github.com/UchaBokeria/goyard"
 )
 
 func main() {
@@ -73,7 +73,7 @@ func main() {
 go 1.21
 
 require (
-	github.com/yourorg/goyard v0.1.0
+	"github.com/UchaBokeria/goyard v0.1.0
 )
 `, filepath.Base(projectPath))
 

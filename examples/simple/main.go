@@ -1,26 +1,16 @@
 package main
 
 import (
-	"fmt"
 	"log"
-	"net/http"
 
-	"github.com/labstack/echo/v4"
-	"github.com/yourorg/goyard"
+	"github.com/UchaBokeria/goyard"
+	"github.com/UchaBokeria/goyard/examples/simple/api"
+	"github.com/UchaBokeria/goyard/examples/simple/app"
 )
 
 func main() {
-	fmt.Printf("GoYard Version: %s\n", goyard.Version)
-
-	e := echo.New()
-
-	// Attach GoYard middleware (adds extended context capabilities)
-	e.Use(goyard.New())
-
-	// Define a simple route for demonstration
-	e.GET("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Hello from GoYard example!")
-	})
-
-	log.Fatal(e.Start(":8080"))
+	web := goyard.New()
+	app.New(web.Group(""))
+	api.New(web.Group("/api"))
+	log.Fatal(web.Start(":8080"))
 }

@@ -1,7 +1,12 @@
 package app
 
-import "github.com/labstack/echo/v4"
+import (
+	"github.com/UchaBokeria/goyard/controller"
+	"github.com/UchaBokeria/goyard/examples/simple/app/dto"
+	"github.com/labstack/echo/v4"
+)
 
-func app(app *echo.Group) {
-	app.GET("", controller.Set[any](index))
+func New(router *echo.Group) {
+	router.GET("", controller.Set[any](index))
+	router.POST("user", controller.Set[dto.UserCreateDto](createUser))
 }

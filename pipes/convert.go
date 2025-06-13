@@ -1,6 +1,12 @@
 package pipes
 
-import "strconv"
+import (
+	"encoding/json"
+	"strconv"
+	"strings"
+)
+
+type Optional = map[string]any
 
 // Int converts a string to an int. If conversion fails it returns 0.
 func Int(s string) int {
@@ -20,6 +26,20 @@ func Bstring(b bool) string {
 		return "true"
 	}
 	return "false"
+}
+
+// Json converts a struct to a json string.
+func Json(data any) string {
+	json, _ := json.Marshal(data)
+	return string(json)
+}
+
+// Alpine converts a struct to a json string.
+func Alpine(data any) string {
+	json, _ := json.Marshal(data)
+	res := string(json)
+	res = strings.Replace(res, `"`, `'`, -1)
+	return `"` + res + `"`
 }
 
 // PtIntToString converts *int to string safely.

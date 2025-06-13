@@ -3,8 +3,8 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/UchaBokeria/goyard"
 	"github.com/spf13/cobra"
-	"github.com/yourorg/goyard"
 )
 
 // versionCmd represents the version command

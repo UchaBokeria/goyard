@@ -42,12 +42,6 @@ func Print(data interface{}) error {
 	return nil
 }
 
-// ToJSON converts arbitrary data to its JSON string representation without error handling.
-func ToJSON(data interface{}) string {
-	bytes, _ := json.Marshal(data)
-	return string(bytes)
-}
-
 // ToSelect converts a slice of structs into a SelectDataType slice based on field names.
 func ToSelect[T any](data []T, keyField, valField string) ([]SelectDataType, error) {
 	v := reflect.ValueOf(data)

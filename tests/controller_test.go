@@ -3,7 +3,7 @@ package tests
 import (
 	"testing"
 
-	"github.com/yourorg/goyard"
+	"github.com/UchaBokeria/goyard"
 )
 
 func TestVersion(t *testing.T) {

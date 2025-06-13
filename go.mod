@@ -1,4 +1,4 @@
-module github.com/yourorg/goyard
+module github.com/UchaBokeria/goyard
 
 go 1.23.0
 
@@ -8,7 +8,6 @@ require (
 	github.com/a-h/templ v0.3.865
 	github.com/go-playground/validator/v10 v10.26.0
 	github.com/spf13/cobra v1.9.1
-// Add dependencies here as needed
 )
 
 require (

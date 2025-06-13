@@ -1,0 +1,21 @@
+package utils
+
+script EventListen(keyword string) {
+    globalThis.Toast = (msg="") => {
+        console.log("sending new event", msg)
+        document.dispatchEvent(new CustomEvent('message', {detail: {type: keyword, msg}}))
+    }
+    document.addEventListener("message", (event) => {
+        console.log("receiving new event", event.detail.type)
+        if (event.detail.type === keyword) {
+            const element = document.querySelector(`#toast`);
+            if (element) {
+                document.querySelector("#toast-message").innerHTML = event.detail.msg
+                element.style.display = 'block';
+                setTimeout(() => {
+                    element.style.display = 'none';
+                }, 3000);
+            }
+        }
+    });
+}

@@ -25,3 +25,6 @@ go.work
 
 # OS specific files
 .DS_Store 
+
+*_templ.go
+bin

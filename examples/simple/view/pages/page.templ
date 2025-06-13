@@ -1,0 +1,56 @@
+package view
+
+import "github.com/UchaBokeria/goyard/examples/simple/view"
+import "github.com/UchaBokeria/goyard/examples/simple/view/ui"
+
+script UserForm(event templ.JSExpression) {
+    const email = event.detail.requestConfig.parameters.get('email')
+    const password = event.detail.requestConfig.parameters.get('password')
+
+    if (!email || !password) {
+        globalThis.Toast("Please fill in all fields")
+        return event.preventDefault();
+    }
+    
+    if (!email.includes('@')) {
+        globalThis.Toast("Please enter a valid email")
+        return event.preventDefault()
+    }
+    
+    if (!globalThis.StrongPassword(password)) {
+        globalThis.Toast("Please enter a strong password")
+        return event.preventDefault()
+    }
+}
+
+templ Page() {
+    @view.Layout() {
+        <div class="w-full">
+        <div class="rounded-lg shadow-md">
+            <p class="text-gray-700 leading-relaxed">
+                goyard is a modern web framework built with go that makes building web applications a breeze! 
+                it combines the power of echo framework with the elegance of templ templating engine. 
+                with built-in support for htmx, form validation, and cookie management, you can create 
+                dynamic web applications with minimal boilerplate. 🛠️ whether you're building a simple 
+                website or a complex web application, goyard provides all the tools you need to get started 
+                quickly and efficiently. ⚡️
+            </p>
+            
+            // @templ.SafeScript()
+            <form 
+                class="flex flex-col gap-2 mt-4"
+                hx-post="/user" hx-target="#users" hx-swap="innerHTML" 
+                hx-on::before-request={UserForm(templ.JSExpression("event"))}
+                hx-on::after-request='globalThis.Toast("Good")'
+                >
+                @ui.Input("text", "", "email", "Email")
+                @ui.Input("password", "", "password", "Password")
+                @ui.Button() {create}
+            </form>
+            
+
+            <div id="users"></div>
+        </div>
+    </div>
+    }
+}

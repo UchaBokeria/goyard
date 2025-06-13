@@ -1,0 +1,16 @@
+package view
+
+import "github.com/UchaBokeria/goyard/examples/simple/view/components"
+import "github.com/UchaBokeria/goyard/examples/simple/view/lib"
+
+templ Layout() {
+	@Index() {
+		<div class="flex flex-col min-h-screen bg-cyan-500 p-8">
+            <h1 class="text-3xl font-bold mb-4">🚀 welcome to goyard! 🎉</h1>
+			<div class="w-full">{ children... }</div>
+		</div>
+
+		@lib.Validation()
+		@components.Toast()
+	}
+}

@@ -12,30 +12,30 @@ import (
 	"github.com/a-h/templ"
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
-	"github.com/yourorg/goyard/internal/model"
 )
 
 // defaultPageMaxSize defines an upper bound for page sizes when no custom configuration is supplied.
 const defaultPageMaxSize = 50
 
 // Context wraps echo.Context and exposes additional helper methods.
-type Context struct {
+type Context[T any] struct {
 	echo.Context
+	data map[string]T
 }
 
 // Initialize returns a middleware that swaps echo.Context with our extended Context.
 func Initialize() echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			ctx := &Context{Context: c}
+			ctx := &Context[any]{Context: c}
 			return next(ctx)
 		}
 	}
 }
 
 // Use converts a handler that expects *controller.Context into a standard echo.HandlerFunc.
-func Use(handler func(*Context) error) echo.HandlerFunc {
-	return func(c echo.Context) error { return handler(c.(*Context)) }
+func Use[T any](handler func(*Context[any]) error) echo.HandlerFunc {
+	return func(c echo.Context) error { return handler(c.(*Context[any])) }
 }
 
 // Set automatically binds request data into a DTO, validates it, and then forwards
@@ -53,7 +53,7 @@ func Set[T any](handler interface{}) echo.HandlerFunc {
 			}
 		}
 
-		args := []reflect.Value{reflect.ValueOf(c.(*Context))}
+		args := []reflect.Value{reflect.ValueOf(c.(*Context[any]))}
 		if reflect.TypeOf(dto).String() != "*interface {}" {
 			argVal := reflect.New(reflect.TypeOf(dto)).Elem()
 			argVal.Set(reflect.ValueOf(dto))
@@ -89,13 +89,13 @@ func Validate(dto interface{}) error {
 }
 
 // Html renders the given templ component with status 200.
-func (ctx *Context) Html(c templ.Component) error {
+func (ctx *Context[T]) Html(c templ.Component) error {
 	return ctx.HtmlWithStatus(http.StatusOK, c)
 }
 
 // HtmlWithStatus renders a component and sends it with the provided HTTP status code.
 // If the request is an HTMX request we render only the fragment.
-func (ctx *Context) HtmlWithStatus(code int, c templ.Component) error {
+func (ctx *Context[T]) HtmlWithStatus(code int, c templ.Component) error {
 	if ctx.IsHtmx() {
 		return c.Render(ctx.Request().Context(), ctx.Response())
 	}
@@ -106,14 +106,14 @@ func (ctx *Context) HtmlWithStatus(code int, c templ.Component) error {
 }
 
 // Renders behaves like HtmlWithStatus but without HTMX logic – always renders raw component.
-func (ctx *Context) Renders(code int, c templ.Component) error {
+func (ctx *Context[T]) Renders(code int, c templ.Component) error {
 	ctx.Response().Header().Set(echo.HeaderContentType, echo.MIMETextHTML)
 	ctx.Response().Writer.WriteHeader(code)
 	return c.Render(ctx.Request().Context(), ctx.Response().Writer)
 }
 
 // IsHtmx reports whether the incoming request is an HTMX request.
-func (ctx *Context) IsHtmx() bool {
+func (ctx *Context[T]) IsHtmx() bool {
 	return ctx.Request().Header.Get("Hx-Request") == "true" && ctx.Request().Header.Get("hx-fullPage") != "true"
 }
 
@@ -125,7 +125,7 @@ type Cookie struct {
 	Expires time.Time
 }
 
-func (ctx *Context) RemoveCookie(key string) {
+func (ctx *Context[T]) RemoveCookie(key string) {
 	cookie := new(http.Cookie)
 	cookie.Name = key
 	cookie.MaxAge = -1
@@ -133,7 +133,7 @@ func (ctx *Context) RemoveCookie(key string) {
 	ctx.SetCookie(cookie)
 }
 
-func (ctx *Context) WriteCookie(data Cookie) {
+func (ctx *Context[T]) WriteCookie(data Cookie) {
 	cookie := new(http.Cookie)
 	cookie.Name = data.Key
 	cookie.Value = data.Value
@@ -141,7 +141,7 @@ func (ctx *Context) WriteCookie(data Cookie) {
 	ctx.SetCookie(cookie)
 }
 
-func (ctx *Context) ReadCookie(key string) Cookie {
+func (ctx *Context[T]) ReadCookie(key string) Cookie {
 	cookie, err := ctx.Cookie(key)
 	if err != nil {
 		cookie = &http.Cookie{Name: "", Value: "", Expires: time.Now()}
@@ -156,7 +156,7 @@ type QueryPageParameter struct {
 	PageSize string `query:"pageSize"`
 }
 
-func (ctx *Context) Page() int {
+func (ctx *Context[T]) Page() int {
 	var q QueryPageParameter
 	if ctx.QueryParam("page") == "" {
 		q.Page = "1"
@@ -170,7 +170,7 @@ func (ctx *Context) Page() int {
 	return p
 }
 
-func (ctx *Context) PageSize() int {
+func (ctx *Context[T]) PageSize() int {
 	var q QueryPageParameter
 	if ctx.QueryParam("pageSize") == "" {
 		q.PageSize = "-1"
@@ -183,19 +183,9 @@ func (ctx *Context) PageSize() int {
 	return size
 }
 
-// Convenience accessors ------------------------------------------------------
-
-func (ctx *Context) IsAdmin() bool {
-	if ctx.Get("ISADMIN") == nil {
-		return false
-	}
-	return ctx.Get("ISADMIN").(bool)
+func (ctx *Context[T]) Set(key string, value T) {
+	ctx.data[key] = value
 }
-
-func (ctx *Context) User() model.Users {
-	u, ok := ctx.Get("USER").(model.Users)
-	if !ok {
-		return model.Users{}
-	}
-	return u
+func (ctx *Context[T]) User() T {
+	return ctx.data["USER"]
 }
