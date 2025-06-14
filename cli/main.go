@@ -1,7 +1,7 @@
-package main
+package cli
 
 import "github.com/UchaBokeria/goyard/cli/cmd"
 
-func main() {
+func Run() {
 	cmd.Execute()
 }

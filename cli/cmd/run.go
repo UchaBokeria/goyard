@@ -20,7 +20,7 @@ var runCmd = &cobra.Command{
 	Short: "Run the GoYard application",
 	Long:  `Run the GoYard application with hot reloading in development mode`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Starting GoYard application...")
+		fmt.Println("🚀 Starting GoYard application...")
 
 		if production {
 			runProductionServer()
@@ -31,7 +31,7 @@ var runCmd = &cobra.Command{
 }
 
 func init() {
-	runCmd.Flags().IntVarP(&port, "port", "p", 8080, "Port to run the server on")
+	runCmd.Flags().IntVarP(&port, "port", "p", 3000, "Port to run the server on")
 	runCmd.Flags().BoolVarP(&production, "production", "P", false, "Run in production mode")
 }
 
