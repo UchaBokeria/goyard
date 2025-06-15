@@ -1,4 +1,3 @@
-// Package goyard provides a comprehensive web framework toolkit for Go.
 package goyard
 
 import (
