@@ -28,7 +28,7 @@ func Dev() {
 			defer wg.Done()
 			out, err := proc()
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "%v\n", err)
+				fmt.Printf("%v\n", err)
 				once.Do(func() { exitChan <- 1 })
 				return
 			}
