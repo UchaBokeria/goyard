@@ -1,93 +1,63 @@
 package run
 
 import (
-	"context"
 	"fmt"
 	"os"
-	"os/signal"
 	"sync"
-	"syscall"
 
 	"github.com/UchaBokeria/goyard/cli/utils"
 )
 
-func Dev(Host string, Port int) {
-	// Create a context that can be cancelled
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+var (
+	Host string
+	Port int
+	WG   sync.WaitGroup
+)
 
-	// Set up signal handling for graceful shutdown
-	sigChan := make(chan os.Signal, 1)
-	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
-
-	processes := []struct {
-		Name string
-		Cmd  string
-	}{
-		{"AIR", `go run github.com/air-verse/air@latest --build.cmd "go build -o ./bin/app ./cmd/app" --build.bin "./bin/app" --build.delay "100" --build.exclude_dir "node_modules" --build.include_ext "go, templ" --build.stop_on_error "false" --misc.clean_on_exit true`},
-		{"TEMPL", fmt.Sprintf(`go run github.com/a-h/templ/cmd/templ@latest generate --open-browser=false --watch --proxy="http://%s:%d" --proxyport="%d" --proxybind="%s"`, Host, Port, 7331, Host)},
-		{"TAILWIND", `bunx --yes tailwindcss -i ./public/assets/styles/tailwind.css -o ./public/assets/styles/style.css --watch`},
+func Dev() {
+	processes := []func() (string, error){
+		Air,
+		Templ,
+		Tailwind,
 	}
-
-	var wg sync.WaitGroup
-	processErrors := make(chan error, len(processes))
-
-	// Start all processes
-	for _, p := range processes {
-		wg.Add(1)
-		go func(name, cmd string) {
-			defer wg.Done()
-
-			outChan, errChan := utils.ExecLiveWithContext(ctx, name, cmd)
-
-			// Handle output and errors
-			for {
-				select {
-				case line, ok := <-outChan:
-					if !ok {
-						return // Channel closed, process finished
-					}
-					fmt.Println(line)
-				case err, ok := <-errChan:
-					if !ok {
-						return // Channel closed
-					}
-					if err != nil {
-						fmt.Fprintf(os.Stderr, "[%s] exited with error: %v\n", name, err)
-						// Send error to main goroutine
-						select {
-						case processErrors <- err:
-						default:
-						}
-						return
-					}
-				case <-ctx.Done():
-					return // Context cancelled
-				}
+	WG.Add(len(processes))
+	for _, process := range processes {
+		go func(process func() (string, error)) {
+			defer WG.Done()
+			o, e := process()
+			if e != nil {
+				fmt.Fprintf(os.Stderr, "Failed to run %s: %v\n", process, e)
+				os.Exit(1)
 			}
-		}(p.Name, p.Cmd)
+			fmt.Println(o)
+		}(process)
 	}
+	WG.Wait()
+}
 
-	// Wait for either all processes to finish, a signal, or an error
-	done := make(chan struct{})
-	go func() {
-		wg.Wait()
-		close(done)
-	}()
+func Air() (string, error) {
+	return utils.Exec(`go run github.com/air-verse/air@latest \
+		--build.cmd "go build -o ./bin/app ./cmd/app" \
+		--build.bin "./bin/app" \
+		--build.delay "100" \
+		--build.exclude_dir "node_modules" \
+		--build.include_ext "go, templ" \
+		--build.stop_on_error "false" \
+		--misc.clean_on_exit true
+	`)
+}
 
-	select {
-	case <-sigChan:
-		fmt.Println("\n🛑 Received shutdown signal, stopping all processes...")
-		cancel() // Cancel context to stop all processes
-		<-done   // Wait for all goroutines to finish
-		fmt.Println("✅ All processes stopped gracefully")
-	case err := <-processErrors:
-		fmt.Fprintf(os.Stderr, "❌ A process failed: %v\nStopping all processes...\n", err)
-		cancel() // Cancel context to stop all processes
-		<-done   // Wait for all goroutines to finish
-		fmt.Println("✅ All processes stopped")
-		os.Exit(1)
-	case <-done:
-		fmt.Println("✅ All processes completed")
-	}
+func Templ() (string, error) {
+	return utils.Exec(fmt.Sprintf(`go run github.com/a-h/templ/cmd/templ@latest \
+	generate \
+	--open-browser=false \
+	--watch \
+	--proxy="http://%s:%d" \
+	--proxyport="%d" \
+	--proxybind="%s"
+	`, Host, Port, 7331, Host))
+}
+
+func Tailwind() (string, error) {
+	return utils.Exec(`bunx --yes tailwindcss -i ./public/assets/styles/tailwind.css -o ./public/assets/styles/style.css --watch`)
 }
