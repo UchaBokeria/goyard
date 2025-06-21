@@ -25,8 +25,9 @@ func Dev() {
 		go func(process func() (string, error)) {
 			defer WG.Done()
 			o, e := process()
+			fmt.Print(o)
 			if e != nil {
-				fmt.Fprintf(os.Stderr, "Failed to run %s: %v\n", process, e)
+				fmt.Fprintf(os.Stderr, "Failed to run %s: \n", e)
 				os.Exit(1)
 			}
 			fmt.Println(o)
