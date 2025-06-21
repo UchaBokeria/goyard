@@ -1,8 +1,6 @@
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/UchaBokeria/goyard/cli/cmd/run"
 	"github.com/spf13/cobra"
 )
@@ -19,8 +17,6 @@ var runCmd = &cobra.Command{
 	Short: "Run the GoYard application",
 	Long:  `Run the GoYard application with hot reloading in development mode`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("🚀 Starting GoYard application...")
-
 		if production {
 			runProductionServer()
 		} else {
@@ -38,7 +34,7 @@ func init() {
 func runDevelopmentServer() {
 	run.Host = host
 	run.Port = port
-	// run.Dev()
+	run.Dev()
 }
 
 func runProductionServer() {
