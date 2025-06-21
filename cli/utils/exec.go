@@ -10,11 +10,11 @@ import (
 func Exec(command string, envs ...string) (string, error) {
 	cmd := exec.Command(command)
 	var errBuf, outBuf bytes.Buffer
-	cmd.Stderr = io.MultiWriter(os.Stderr, &errBuf)
-	cmd.Stdout = io.MultiWriter(os.Stdout, &outBuf)
+	cmd.Stderr = io.MultiWriter(&errBuf, os.Stderr)
+	cmd.Stdout = io.MultiWriter(&outBuf)
 	for _, env := range envs {
 		cmd.Env = append(os.Environ(), env)
 	}
-	output, err := cmd.CombinedOutput()
-	return string(output), err
+	err := cmd.Run()
+	return outBuf.String(), err
 }
