@@ -15,23 +15,16 @@ var (
 )
 
 func Dev() {
-	processes := []func(){
-		Air,
-		Templ,
-		Tailwind,
-		Assets,
-	}
-	WG.Add(len(processes))
-	for _, process := range processes {
-		go func(process func()) {
-			defer WG.Done()
-			process()
-		}(process)
-	}
+	WG.Add(4)
+	go Air()
+	go Templ()
+	go Tailwind()
+	go Assets()
 	WG.Wait()
 }
 
 func Air() {
+	defer WG.Done()
 	o, e := utils.Exec(`go run github.com/air-verse/air@latest \
 		--build.cmd "go build -o ./bin/app ./cmd/app" \
 		--build.bin "./bin/app" \
@@ -69,6 +62,7 @@ func Air() {
 }
 
 func Templ() {
+	defer WG.Done()
 	o, e := utils.Exec(fmt.Sprintf(`go run github.com/a-h/templ/cmd/templ@latest \
 	generate \
 	--open-browser=false \
@@ -85,6 +79,7 @@ func Templ() {
 }
 
 func Tailwind() {
+	defer WG.Done()
 	o, e := utils.Exec(`bunx --yes tailwindcss -i ./public/assets/styles/tailwind.css -o ./public/assets/styles/style.css --watch`)
 	if e != nil {
 		fmt.Fprintf(os.Stderr, "Failed to run tailwind: %v\n", e)
@@ -94,4 +89,5 @@ func Tailwind() {
 }
 
 func Assets() {
+	defer WG.Done()
 }
