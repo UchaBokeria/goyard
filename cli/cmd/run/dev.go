@@ -45,13 +45,11 @@ func Dev() {
 }
 
 func Air() (string, error) {
-	cmd := `go run github.com/air-verse/air@latest --build.cmd "go build -o ./bin/app ./cmd/app" --build.bin "./bin/app" --build.delay "100" --build.exclude_dir "node_modules" --build.include_ext "go, templ" --build.stop_on_error "false" --misc.clean_on_exit true`
-	return utils.Exec(cmd)
+	return utils.Exec(`go run github.com/air-verse/air@latest --build.cmd "go build -o ./bin/app ./cmd/app" --build.bin "./bin/app" --build.delay "100" --build.exclude_dir "node_modules" --build.include_ext "go, templ" --build.stop_on_error "false" --misc.clean_on_exit true`)
 }
 
 func Templ() (string, error) {
-	cmd := fmt.Sprintf(`go run github.com/a-h/templ/cmd/templ@latest generate --open-browser=false --watch --proxy="http://%s:%d" --proxyport="%d" --proxybind="%s"`, Host, Port, 7331, Host)
-	return utils.Exec(cmd)
+	return utils.Exec(fmt.Sprintf(`go run github.com/a-h/templ/cmd/templ@latest generate --open-browser=false --watch --proxy="http://%s:%d" --proxyport="%d" --proxybind="%s"`, Host, Port, 7331, Host))
 }
 
 func Tailwind() (string, error) {
