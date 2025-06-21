@@ -36,7 +36,6 @@ func init() {
 }
 
 func runDevelopmentServer() {
-	fmt.Printf("🔥 Running in development mode on %s:%d\n", host, port)
 	run.Host = host
 	run.Port = port
 	run.Dev()
