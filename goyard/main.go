@@ -1,6 +1,8 @@
 package goyard
 
 import (
+	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/UchaBokeria/goyard/controller"
@@ -14,8 +16,17 @@ const Version = "0.1.3"
 func RunRegister(echo *echo.Echo) func(address string) error {
 	return func(address string) error {
 		parts := strings.Split(address, ":")
+		originalPort, err := strconv.Atoi(parts[len(parts)-1])
+		newPort := originalPort - 1
+		if err != nil {
+			return fmt.Errorf("invalid port: %w", err)
+		}
 		if len(parts) > 1 {
-			address = strings.Join(parts[:len(parts)-1], ":") + ":7331"
+			address = strings.Join(parts[:len(parts)-1], ":") + ":" + strconv.Itoa(newPort)
+			fmt.Println("🚀 Starting server on", strings.Join(parts[:len(parts)-1], ":")+":"+strconv.Itoa(originalPort))
+		} else {
+			address = "localhost:" + strconv.Itoa(newPort)
+			fmt.Println("🚀 Starting server on", "localhost:"+strconv.Itoa(originalPort))
 		}
 		return echo.Start(address)
 	}
@@ -32,6 +43,8 @@ func RunRegister(echo *echo.Echo) func(address string) error {
 //	e.Use(goyard.New())
 func New() *types.Goyard {
 	echo := echo.New()
+	echo.HidePort = true
+	echo.HideBanner = true
 	echo.Use(controller.Initialize())
 	return &types.Goyard{Echo: *echo, Run: RunRegister(echo)}
 }
