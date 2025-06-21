@@ -2,6 +2,7 @@ package utils
 
 import (
 	"bufio"
+	"fmt"
 	"io"
 	"os/exec"
 	"strings"
@@ -14,28 +15,38 @@ func ExecLive(name, command string) (<-chan string, <-chan error) {
 	cmdArgs := strings.Fields(command)
 	cmd := exec.Command(cmdArgs[0], cmdArgs[1:]...)
 
-	stdout, _ := cmd.StdoutPipe()
-	stderr, _ := cmd.StderrPipe()
+	stdoutPipe, err := cmd.StdoutPipe()
+	if err != nil {
+		errChan <- fmt.Errorf("%s stdout pipe: %w", name, err)
+		close(outChan)
+		close(errChan)
+		return outChan, errChan
+	}
 
-	merged := io.MultiReader(stdout, stderr)
-	scanner := bufio.NewScanner(merged)
+	stderrPipe, err := cmd.StderrPipe()
+	if err != nil {
+		errChan <- fmt.Errorf("%s stderr pipe: %w", name, err)
+		close(outChan)
+		close(errChan)
+		return outChan, errChan
+	}
 
 	go func() {
 		defer close(outChan)
 		defer close(errChan)
 
 		if err := cmd.Start(); err != nil {
-			errChan <- err
+			errChan <- fmt.Errorf("%s start error: %w", name, err)
 			return
 		}
 
+		scanner := bufio.NewScanner(io.MultiReader(stdoutPipe, stderrPipe))
 		for scanner.Scan() {
-			outChan <- "[" + name + "] " + scanner.Text()
+			outChan <- fmt.Sprintf("[%s] %s", name, scanner.Text())
 		}
 
 		if err := cmd.Wait(); err != nil {
-			errChan <- err
-			return
+			errChan <- fmt.Errorf("%s wait error: %w", name, err)
 		}
 	}()
 
