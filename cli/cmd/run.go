@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"fmt"
+
 	"github.com/UchaBokeria/goyard/cli/cmd/run"
 	"github.com/spf13/cobra"
 )
@@ -32,6 +34,7 @@ func init() {
 }
 
 func runDevelopmentServer() {
+	fmt.Printf("� Running in development mode on %s:%d\n", host, port)
 	run.Host = host
 	run.Port = port
 	run.Dev()
