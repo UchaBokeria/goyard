@@ -27,7 +27,7 @@ func Dev() {
 			o, e := process()
 			fmt.Print(o)
 			if e != nil {
-				fmt.Fprintf(os.Stderr, "Failed to run %s: \n", e)
+				fmt.Fprintf(os.Stderr, "Failed to run %s: %v\n", process, e)
 				os.Exit(1)
 			}
 			fmt.Println(o)
