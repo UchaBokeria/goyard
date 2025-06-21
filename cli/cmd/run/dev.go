@@ -8,50 +8,32 @@ import (
 	"github.com/UchaBokeria/goyard/cli/utils"
 )
 
-var (
-	Host     string
-	Port     int
-	wg       sync.WaitGroup
-	once     sync.Once
-	exitChan = make(chan int, 1) // buffered to avoid blocking
-)
-
-func Dev() {
-	processes := []func() (string, error){
-		Air,
-		Templ,
-		Tailwind,
+func Dev(Host string, Port int) {
+	processes := []struct {
+		Name string
+		Cmd  string
+	}{
+		{"AIR", `go run github.com/air-verse/air@latest --build.cmd "go build -o ./bin/app ./cmd/app" --build.bin "./bin/app" --build.delay "100" --build.exclude_dir "node_modules" --build.include_ext "go, templ" --build.stop_on_error "false" --misc.clean_on_exit true`},
+		{"TEMPL", fmt.Sprintf(`go run github.com/a-h/templ/cmd/templ@latest generate --open-browser=false --watch --proxy="http://%s:%d" --proxyport="%d" --proxybind="%s"`, Host, Port, 7331, Host)},
+		{"TAILWIND", `bunx --yes tailwindcss -i ./public/assets/styles/tailwind.css -o ./public/assets/styles/style.css --watch`},
 	}
-	wg.Add(len(processes))
-	for _, process := range processes {
-		go func(proc func() (string, error)) {
+
+	var wg sync.WaitGroup
+	for _, p := range processes {
+		wg.Add(1)
+		go func(name, cmd string) {
 			defer wg.Done()
-			out, err := proc()
-			if err != nil {
-				fmt.Printf("%v\n", err)
-				once.Do(func() { exitChan <- 1 })
-				return
+			outChan, errChan := utils.ExecLive(name, cmd)
+
+			for line := range outChan {
+				fmt.Println(line)
 			}
-			fmt.Println(out)
-		}(process)
+
+			if err := <-errChan; err != nil {
+				fmt.Fprintf(os.Stderr, "[%s] exited with error: %v\n", name, err)
+			}
+		}(p.Name, p.Cmd)
 	}
 
-	go func() {
-		wg.Wait()
-		once.Do(func() { exitChan <- 0 })
-	}()
-
-	os.Exit(<-exitChan)
-}
-
-func Air() (string, error) {
-	return utils.Exec(`go run github.com/air-verse/air@latest --build.cmd "go build -o ./bin/app ./cmd/app" --build.bin "./bin/app" --build.delay "100" --build.exclude_dir "node_modules" --build.include_ext "go, templ" --build.stop_on_error "false" --misc.clean_on_exit true`)
-}
-
-func Templ() (string, error) {
-	return utils.Exec(fmt.Sprintf(`go run github.com/a-h/templ/cmd/templ@latest generate --open-browser=false --watch --proxy="http://%s:%d" --proxyport="%d" --proxybind="%s"`, Host, Port, 7331, Host))
-}
-
-func Tailwind() (string, error) {
-	return utils.Exec(`bunx --yes tailwindcss -i ./public/assets/styles/tailwind.css -o ./public/assets/styles/style.css --watch`)
+	wg.Wait()
 }
