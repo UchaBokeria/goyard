@@ -15,28 +15,24 @@ var (
 )
 
 func Dev() {
-	processes := []func() (string, error){
+	processes := []func(){
 		Air,
 		Templ,
 		Tailwind,
+		Assets,
 	}
 	WG.Add(len(processes))
 	for _, process := range processes {
-		go func(process func() (string, error)) {
+		go func(process func()) {
 			defer WG.Done()
-			o, e := process()
-			if e != nil {
-				fmt.Fprintf(os.Stderr, "Failed to run %s: %v\n", process, e)
-				os.Exit(1)
-			}
-			fmt.Println(o)
+			process()
 		}(process)
 	}
 	WG.Wait()
 }
 
-func Air() (string, error) {
-	return utils.Exec(`go run github.com/air-verse/air@latest \
+func Air() {
+	o, e := utils.Exec(`go run github.com/air-verse/air@latest \
 		--build.cmd "go build -o ./bin/app ./cmd/app" \
 		--build.bin "./bin/app" \
 		--build.delay "100" \
@@ -45,10 +41,35 @@ func Air() (string, error) {
 		--build.stop_on_error "false" \
 		--misc.clean_on_exit true
 	`)
+	if e != nil {
+		fmt.Fprintf(os.Stderr, "Failed to run air: %v\n", e)
+		os.Exit(1)
+	}
+	fmt.Println(o)
+
+	//	if err := os.WriteFile(".air.toml", []byte(`root = "."
+	//
+	// tmp_dir = "tmp"
+	// [build]
+	//
+	//	cmd = "go build -o ./tmp/main ."
+	//	bin = "./tmp/main"
+	//	delay = 1000
+	//	exclude_dir = ["assets", "tmp", "vendor"]
+	//	include_ext = ["go", "tpl", "tmpl", "templ", "html"]
+	//	exclude_regex = ["_test\\.go"]
+	//
+	// [screen]
+	//
+	//	clear_on_rebuild = true
+	//
+	//	`), 0644); err != nil {
+	//			fmt.Fprintf(os.Stderr, "Failed to create .air.toml: %v\n", err)
+	//		}
 }
 
-func Templ() (string, error) {
-	return utils.Exec(fmt.Sprintf(`go run github.com/a-h/templ/cmd/templ@latest \
+func Templ() {
+	o, e := utils.Exec(fmt.Sprintf(`go run github.com/a-h/templ/cmd/templ@latest \
 	generate \
 	--open-browser=false \
 	--watch \
@@ -56,8 +77,21 @@ func Templ() (string, error) {
 	--proxyport="%d" \
 	--proxybind="%s"
 	`, Host, Port, 7331, Host))
+	if e != nil {
+		fmt.Fprintf(os.Stderr, "Failed to run templ: %v\n", e)
+		os.Exit(1)
+	}
+	fmt.Println(o)
 }
 
-func Tailwind() (string, error) {
-	return utils.Exec(`bunx --yes tailwindcss -i ./public/assets/styles/tailwind.css -o ./public/assets/styles/style.css --watch`)
+func Tailwind() {
+	o, e := utils.Exec(`bunx --yes tailwindcss -i ./public/assets/styles/tailwind.css -o ./public/assets/styles/style.css --watch`)
+	if e != nil {
+		fmt.Fprintf(os.Stderr, "Failed to run tailwind: %v\n", e)
+		os.Exit(1)
+	}
+	fmt.Println(o)
+}
+
+func Assets() {
 }
