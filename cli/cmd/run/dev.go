@@ -9,9 +9,11 @@ import (
 )
 
 var (
-	Host string
-	Port int
-	WG   sync.WaitGroup
+	Host     string
+	Port     int
+	wg       sync.WaitGroup
+	once     sync.Once
+	exitChan = make(chan int, 1) // buffered to avoid blocking
 )
 
 func Dev() {
@@ -20,43 +22,36 @@ func Dev() {
 		Templ,
 		Tailwind,
 	}
-	WG.Add(len(processes))
+	wg.Add(len(processes))
 	for _, process := range processes {
-		go func(process func() (string, error)) {
-			defer WG.Done()
-			o, e := process()
-			fmt.Print(o)
-			if e != nil {
-				fmt.Fprintf(os.Stderr, "Failed to run %s: %v\n", process, e)
-				os.Exit(1)
+		go func(proc func() (string, error)) {
+			defer wg.Done()
+			out, err := proc()
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "%v\n", err)
+				once.Do(func() { exitChan <- 1 })
+				return
 			}
-			fmt.Println(o)
+			fmt.Println(out)
 		}(process)
 	}
-	WG.Wait()
+
+	go func() {
+		wg.Wait()
+		once.Do(func() { exitChan <- 0 })
+	}()
+
+	os.Exit(<-exitChan)
 }
 
 func Air() (string, error) {
-	return utils.Exec(`go run github.com/air-verse/air@latest \
-		--build.cmd "go build -o ./bin/app ./cmd/app" \
-		--build.bin "./bin/app" \
-		--build.delay "100" \
-		--build.exclude_dir "node_modules" \
-		--build.include_ext "go, templ" \
-		--build.stop_on_error "false" \
-		--misc.clean_on_exit true
-	`)
+	cmd := `go run github.com/air-verse/air@latest --build.cmd "go build -o ./bin/app ./cmd/app" --build.bin "./bin/app" --build.delay "100" --build.exclude_dir "node_modules" --build.include_ext "go, templ" --build.stop_on_error "false" --misc.clean_on_exit true`
+	return utils.Exec(cmd)
 }
 
 func Templ() (string, error) {
-	return utils.Exec(fmt.Sprintf(`go run github.com/a-h/templ/cmd/templ@latest \
-	generate \
-	--open-browser=false \
-	--watch \
-	--proxy="http://%s:%d" \
-	--proxyport="%d" \
-	--proxybind="%s"
-	`, Host, Port, 7331, Host))
+	cmd := fmt.Sprintf(`go run github.com/a-h/templ/cmd/templ@latest generate --open-browser=false --watch --proxy="http://%s:%d" --proxyport="%d" --proxybind="%s"`, Host, Port, 7331, Host)
+	return utils.Exec(cmd)
 }
 
 func Tailwind() (string, error) {
