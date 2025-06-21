@@ -38,7 +38,7 @@ func init() {
 func runDevelopmentServer() {
 	run.Host = host
 	run.Port = port
-	run.Dev()
+	// run.Dev()
 }
 
 func runProductionServer() {
