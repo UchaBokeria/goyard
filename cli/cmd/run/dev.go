@@ -34,7 +34,7 @@ func Dev() {
 			"--proxyport=7331",
 			"--proxybind=" + Host,
 		},
-		{"bunx", "--yes", "tailwindcss", "-i", "./public/assets/styles/tailwind.css", "-o", "./public/assets/styles/style.css", "--watch"},
+		// {"bunx", "--yes", "tailwindcss", "-i", "./public/assets/styles/tailwind.css", "-o", "./public/assets/styles/style.css", "--watch"},
 	}
 
 	wg.Add(len(commands))
