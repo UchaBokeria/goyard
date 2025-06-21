@@ -12,5 +12,5 @@ func main() {
 	web := goyard.New()
 	app.New(web.Group(""))
 	api.New(web.Group("/api"))
-	log.Fatal(web.Start(":8080"))
+	log.Fatal(web.Run(":3000"))
 }
