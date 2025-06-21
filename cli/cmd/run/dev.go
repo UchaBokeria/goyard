@@ -13,6 +13,7 @@ var (
 )
 
 func Dev() {
+	return
 	var wg sync.WaitGroup
 	commands := [][]string{
 		{"go", "run", "github.com/air-verse/air@latest",
