@@ -9,7 +9,7 @@ import (
 )
 
 // Version represents the current version of the goyard framework
-const Version = "0.1.0"
+const Version = "0.1.3"
 
 func RunRegister(echo *echo.Echo) func(address string) error {
 	return func(address string) error {
