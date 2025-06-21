@@ -1,6 +1,8 @@
 package run
 
 import (
+	"fmt"
+	"os"
 	"strconv"
 	"sync"
 
@@ -39,7 +41,12 @@ func Dev() {
 	for _, cmd := range commands {
 		go func(c []string) {
 			defer wg.Done()
-			utils.Exec(c[0], c[1:]...)
+			o, e := utils.Exec(c[0], c[1:]...)
+			if e != nil {
+				fmt.Fprintf(os.Stderr, "Failed to run %s: %v\n", c[0], e)
+				os.Exit(1)
+			}
+			fmt.Println(o)
 		}(cmd)
 	}
 
