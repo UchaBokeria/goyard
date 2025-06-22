@@ -2,7 +2,7 @@ package app
 
 import (
 	"github.com/UchaBokeria/goyard/controller"
-	"github.com/UchaBokeria/goyard/examples/simple/app/dto"
+	"github.com/UchaBokeria/goyard/examples/simple/web/app/dto"
 	"github.com/labstack/echo/v4"
 )
 

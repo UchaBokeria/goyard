@@ -23,11 +23,10 @@ func RunRegister(echo *echo.Echo) func(address string) error {
 		}
 		if len(parts) > 1 {
 			address = strings.Join(parts[:len(parts)-1], ":") + ":" + strconv.Itoa(newPort)
-			fmt.Println("🚀 Starting server on", strings.Join(parts[:len(parts)-1], ":")+":"+strconv.Itoa(originalPort))
 		} else {
 			address = "localhost:" + strconv.Itoa(newPort)
-			fmt.Println("🚀 Starting server on", "localhost:"+strconv.Itoa(originalPort))
 		}
+		fmt.Println("🚀 Starting server on", strings.Replace(address, strconv.Itoa(newPort), strconv.Itoa(originalPort), 1))
 		return echo.Start(address)
 	}
 }
@@ -39,16 +38,14 @@ func RunRegister(echo *echo.Echo) func(address string) error {
 //
 // Usage:
 //
-//	e := echo.New()
-//	e.Use(goyard.New())
+//	app := goyard.New()
+//	app.Use(middlewares.Htmx())
+//	app.Use(middlewares.Interceptor())
+//	app.Run(":3000")
 func New() *types.Goyard {
 	echo := echo.New()
 	echo.HidePort = true
 	echo.HideBanner = true
 	echo.Use(controller.Initialize())
-	return &types.Goyard{Echo: *echo, Run: RunRegister(echo)}
-}
-
-func Use(echo *types.Goyard) {
-	echo.Use(controller.Initialize())
+	return &types.Goyard{Echo: echo, Run: RunRegister(echo)}
 }

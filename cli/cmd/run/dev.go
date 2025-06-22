@@ -32,16 +32,16 @@ func Dev() {
 	}{
 		{
 			"AIR",
-			`go run github.com/air-verse/air@latest --build.cmd "go build -o ./bin/app ./cmd/app" --build.bin "./bin/app" --build.delay "100" --build.exclude_dir "node_modules" --build.include_ext "go, templ" --build.stop_on_error "false" --misc.clean_on_exit true`,
+			`go run github.com/air-verse/air@latest --build.cmd "go build -o ./bin/app ./cmd/app" --build.bin "./bin/app" --build.delay "100" --build.exclude_dir "node_modules" --build.include_ext "go, templ" --build.stop_on_error "false" --log.time "true" --log.main_only "true"`,
 		},
 		{
 			"TEMPL",
-			`go run github.com/a-h/templ/cmd/templ@latest generate --open-browser=false --watch --proxy="http://localhost:2999" --proxyport="3000" --proxybind="localhost"`,
+			fmt.Sprintf(`go run github.com/a-h/templ/cmd/templ@latest generate --open-browser=false --watch --proxy="http://%s:%d" --proxyport="%d" --proxybind="%s"`, Host, Port-1, Port, Host),
 		},
-		// {
-		// 	"TAILWIND",
-		// 	`bunx tailwindcss -i ./public/assets/styles/tailwind.css -o ./public/assets/styles/style.css --watch`,
-		// },
+		{
+			"TAILWIND",
+			`bunx --yes tailwindcss -i ./public/assets/styles/tailwind.css -o ./public/assets/styles/style.css --watch`,
+		},
 	}
 
 	var wg sync.WaitGroup

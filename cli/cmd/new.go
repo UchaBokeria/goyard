@@ -44,7 +44,7 @@ func init() {
 	newCmd.Flags().StringVarP(&template, "template", "t", "basic", "Template to use (basic, api, htmx, full)")
 }
 
-func createProjectStructure(projectPath, template string) {
+func createProjectStructure(projectPath, _ string) {
 	// Create main.go
 	mainContent := `package main
 

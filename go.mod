@@ -5,7 +5,7 @@ go 1.23.0
 toolchain go1.24.3
 
 require (
-	github.com/a-h/templ v0.3.865
+	github.com/a-h/templ v0.3.898
 	github.com/go-playground/validator/v10 v10.26.0
 	github.com/spf13/cobra v1.9.1
 )

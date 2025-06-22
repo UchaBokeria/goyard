@@ -2,7 +2,7 @@ package api
 
 import (
 	"github.com/UchaBokeria/goyard/controller"
-	"github.com/UchaBokeria/goyard/examples/simple/view"
+	"github.com/UchaBokeria/goyard/examples/simple/web/view"
 	"github.com/labstack/echo/v4"
 )
 

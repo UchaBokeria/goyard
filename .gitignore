@@ -29,3 +29,6 @@ go.work
 *_templ.go
 bin
 tmp
+node_modules
+.env
+public/uploads

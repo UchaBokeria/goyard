@@ -7,6 +7,6 @@ type Route struct {
 }
 
 type Goyard struct {
-	echo.Echo
+	*echo.Echo
 	Run func(address string) error
 }

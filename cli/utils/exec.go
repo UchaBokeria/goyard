@@ -33,7 +33,10 @@ func ExecLiveWithContext(ctx context.Context, name, command string) (<-chan stri
 	cmd := exec.CommandContext(ctx, "sh", "-c", command)
 
 	// Set process group to allow killing child processes
-	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
+	cmd.SysProcAttr = &syscall.SysProcAttr{
+		Setpgid: true,
+		Pgid:    0,
+	}
 
 	stdoutPipe, err := cmd.StdoutPipe()
 	if err != nil {
@@ -127,6 +130,22 @@ func ExecLiveWithContext(ctx context.Context, name, command string) (<-chan stri
 			// Wait for output readers to finish processing remaining output
 			<-outputDone
 		case <-ctx.Done():
+			// Kill the entire process group when context is cancelled
+			if cmd.Process != nil {
+				pgid, err := syscall.Getpgid(cmd.Process.Pid)
+				if err == nil {
+					// Kill the entire process group (negative PID kills the group)
+					syscall.Kill(-pgid, syscall.SIGTERM)
+					// Give processes time to terminate gracefully
+					select {
+					case <-waitDone:
+						// Process terminated
+					case <-ctx.Done():
+						// Force kill if graceful termination didn't work
+						syscall.Kill(-pgid, syscall.SIGKILL)
+					}
+				}
+			}
 			errChan <- ctx.Err()
 		}
 	}()

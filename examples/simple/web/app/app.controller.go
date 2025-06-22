@@ -2,9 +2,9 @@ package app
 
 import (
 	"github.com/UchaBokeria/goyard/controller"
-	"github.com/UchaBokeria/goyard/examples/simple/app/dto"
-	"github.com/UchaBokeria/goyard/examples/simple/view/components"
-	view "github.com/UchaBokeria/goyard/examples/simple/view/pages"
+	"github.com/UchaBokeria/goyard/examples/simple/web/app/dto"
+	"github.com/UchaBokeria/goyard/examples/simple/web/view/components"
+	view "github.com/UchaBokeria/goyard/examples/simple/web/view/pages"
 )
 
 func index(ctx *controller.Context[any]) error {
