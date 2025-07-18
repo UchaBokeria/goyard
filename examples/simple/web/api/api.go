@@ -6,7 +6,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func index(ctx *controller.Context[any]) error {
+func index(ctx *controller.Context) error {
 	return ctx.Html(view.Index())
 }
 

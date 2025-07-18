@@ -7,7 +7,7 @@ import (
 
 func Interceptor() echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
-		return controller.Set[any](func(ctx *controller.Context[any]) error {
+		return controller.Use(func(ctx *controller.Context) error {
 			return next(ctx)
 		})
 	}

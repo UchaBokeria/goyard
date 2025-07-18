@@ -7,10 +7,10 @@ import (
 	view "github.com/UchaBokeria/goyard/examples/simple/web/view/pages"
 )
 
-func index(ctx *controller.Context[any]) error {
+func index(ctx *controller.Context) error {
 	return ctx.Html(view.Page())
 }
 
-func createUser(ctx *controller.Context[any], user *dto.UserCreateDto) error {
+func createUser(ctx *controller.Context, user *dto.UserCreateDto) error {
 	return ctx.Html(components.User(user))
 }
