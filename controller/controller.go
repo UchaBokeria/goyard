@@ -236,10 +236,11 @@ func (ctx *Context) WriteCookie(data Cookie) {
 
 	ctx.SetCookie(cookie)
 }
+
 func (ctx *Context) ReadCookie(key string) Cookie {
 	cookie, err := ctx.Cookie(key)
 	if err != nil {
 		cookie = &http.Cookie{Name: "", Value: "", Expires: time.Now()}
 	}
-	return Cookie{Key: cookie.Name, Value: cookie.Value, Expires: cookie.Expires}
+	return Cookie{Key: cookie.Name, Value: cookie.Value, Expires: Ptr(cookie.Expires)}
 }
