@@ -167,11 +167,16 @@ func (ctx *Context) IsHtmx() bool {
 }
 
 // Cookie utilities -----------------------------------------------------------
-
 type Cookie struct {
-	Key     string
-	Value   string
-	Expires time.Time
+	Key      string     // required
+	Value    string     // required
+	Expires  *time.Time // optional
+	Path     *string    // optional
+	MaxAge   *int       // optional
+	HttpOnly *bool      // optional
+	SameSite *string    // optional (map to http.SameSite later)
+	Domain   *string    // optional
+	Quoted   *bool      // optional
 }
 
 func (ctx *Context) RemoveCookie(key string) {
@@ -179,17 +184,58 @@ func (ctx *Context) RemoveCookie(key string) {
 	cookie.Name = key
 	cookie.MaxAge = -1
 	cookie.Expires = time.Unix(0, 0)
+
 	ctx.SetCookie(cookie)
+}
+
+func Ptr[T any](v T) *T { return &v }
+
+func quoteIf(shouldQuote bool, val string) string {
+	if shouldQuote {
+		return `"` + val + `"`
+	}
+	return val
 }
 
 func (ctx *Context) WriteCookie(data Cookie) {
 	cookie := new(http.Cookie)
 	cookie.Name = data.Key
 	cookie.Value = data.Value
-	cookie.Expires = data.Expires
+
+	if data.Expires != nil {
+		cookie.Expires = *data.Expires
+	}
+	if data.Path != nil {
+		cookie.Path = *data.Path
+	}
+	if data.MaxAge != nil {
+		cookie.MaxAge = *data.MaxAge
+	}
+	if data.HttpOnly != nil {
+		cookie.HttpOnly = *data.HttpOnly
+	}
+	if data.SameSite != nil {
+		switch *data.SameSite {
+		case "Strict":
+			cookie.SameSite = http.SameSiteStrictMode
+		case "Lax":
+			cookie.SameSite = http.SameSiteLaxMode
+		case "None":
+			cookie.SameSite = http.SameSiteNoneMode
+		default:
+			// invalid values fallback to default (unset)
+			cookie.SameSite = http.SameSiteStrictMode
+		}
+	}
+	if data.Domain != nil {
+		cookie.Domain = *data.Domain
+	}
+	if data.Quoted != nil {
+		cookie.Raw = quoteIf(*data.Quoted, data.Value)
+	}
+
 	ctx.SetCookie(cookie)
 }
-
 func (ctx *Context) ReadCookie(key string) Cookie {
 	cookie, err := ctx.Cookie(key)
 	if err != nil {
