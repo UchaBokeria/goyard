@@ -11,7 +11,7 @@ import (
 var rootCmd = &cobra.Command{
 	Use:   "goyard",
 	Short: "GoYard - A comprehensive Go web framework toolkit",
-	Long: `GoYard is a web framework toolkit that provides essential components
+	Long: `* GoYard is a web framework toolkit that provides essential components
 for web development including HTMX integration, Alpine.js, Tailwind CSS,
 and hot reloading for development.`,
 	Run: func(cmd *cobra.Command, args []string) {

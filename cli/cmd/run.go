@@ -16,8 +16,8 @@ var (
 // runCmd represents the run command
 var runCmd = &cobra.Command{
 	Use:   "run",
-	Short: "Run the GoYard project with live reload",
-	Long:  `Run the GoYard application with hot reloading in development mode`,
+	Short: "Run the GoYard project with live reload for dev",
+	Long:  `Run the GoYard project with hot reloading in development mode`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if production {
 			runProductionServer()
