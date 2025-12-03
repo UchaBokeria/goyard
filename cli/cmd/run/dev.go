@@ -40,7 +40,7 @@ func Dev() {
 		},
 		{
 			"TAILWIND",
-			`bunx --yes tailwindcss -i ./public/assets/styles/tailwind.css -o ./public/assets/styles/style.css --watch`,
+			`bunx --yes tailwindcss/cli -i ./public/assets/styles/tailwind.css -o ./public/assets/styles/style.css --watch`,
 		},
 	}
 
