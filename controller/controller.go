@@ -156,7 +156,7 @@ func (ctx *Context) HtmlWithStatus(code int, c templ.Component) error {
 }
 
 // Simple page renderer
-func Page(page templ.Component) any {
+func (ctx *Context) Page(page templ.Component) any {
 	return controller.Set[any](func(ctx *controller.Context) error {
 		return ctx.Html(page)
 	})
