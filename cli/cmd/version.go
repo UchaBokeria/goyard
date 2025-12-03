@@ -10,7 +10,7 @@ import (
 // versionCmd represents the version command
 var versionCmd = &cobra.Command{
 	Use:   "version",
-	Short: "Display the version of GoYard",
+	Short: "Display the version of GoYard tool",
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Printf("GoYard v%s\n", goyard.Version)
 	},
