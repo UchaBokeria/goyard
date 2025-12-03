@@ -155,7 +155,7 @@ func (ctx *Context) HtmlWithStatus(code int, c templ.Component) error {
 	return base.Render(ctx.Request().Context(), ctx.Response().Writer)
 }
 
-// Simple page renderer
+// Simple page renderer ok
 func Page(page templ.Component) any {
 	return controller.Set[any](func(ctx *controller.Context) error {
 		return ctx.Html(page)
