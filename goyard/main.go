@@ -51,8 +51,8 @@ func New() *types.Goyard {
 	return &types.Goyard{Echo: echo, Run: RunRegister(echo)}
 }
 
-func Render(page templ.Component) any {
-	return func(ctx *controller.Context) error {
+func Page(page templ.Component) any {
+	return controller.Set[any](func(ctx *controller.Context) error {
 		return ctx.Html(page)
-	}
+	})
 }
