@@ -7,7 +7,6 @@ import (
 
 	"github.com/UchaBokeria/goyard/controller"
 	"github.com/UchaBokeria/goyard/types"
-	"github.com/a-h/templ"
 	"github.com/labstack/echo/v4"
 )
 
@@ -51,8 +50,3 @@ func New() *types.Goyard {
 	return &types.Goyard{Echo: echo, Run: RunRegister(echo)}
 }
 
-func Page(page templ.Component) any {
-	return controller.Set[any](func(ctx *controller.Context) error {
-		return ctx.Html(page)
-	})
-}

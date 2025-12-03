@@ -9,6 +9,7 @@ import (
 	"regexp"
 	"time"
 
+	"github.com/UchaBokeria/goyard/controller"
 	"github.com/a-h/templ"
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
@@ -152,6 +153,13 @@ func (ctx *Context) HtmlWithStatus(code int, c templ.Component) error {
 	ctx.Response().Header().Set(echo.HeaderContentType, echo.MIMETextHTML)
 	ctx.Response().Writer.WriteHeader(code)
 	return base.Render(ctx.Request().Context(), ctx.Response().Writer)
+}
+
+// Simple page renderer
+func Page(page templ.Component) any {
+	return controller.Set[any](func(ctx *controller.Context) error {
+		return ctx.Html(page)
+	})
 }
 
 // Renders behaves like HtmlWithStatus but without HTMX logic – always renders raw component.
