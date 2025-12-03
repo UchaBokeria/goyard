@@ -7,6 +7,7 @@ import (
 
 	"github.com/UchaBokeria/goyard/controller"
 	"github.com/UchaBokeria/goyard/types"
+	"github.com/a-h/templ"
 	"github.com/labstack/echo/v4"
 )
 
@@ -48,4 +49,10 @@ func New() *types.Goyard {
 	echo.HideBanner = true
 	echo.Use(controller.Initialize())
 	return &types.Goyard{Echo: echo, Run: RunRegister(echo)}
+}
+
+func Render(page templ.Component) any {
+	return func(ctx *controller.Context) error {
+		return ctx.Html(page)
+	}
 }
