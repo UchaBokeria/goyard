@@ -14,8 +14,11 @@ import (
 // Version represents the current version of the goyard framework
 const Version = "0.1.3"
 
-func RunRegister(echo *echo.Echo) func(address string) error {
+func RunRegister(echo *echo.Echo, dev bool) func(address string) error {
 	return func(address string) error {
+		if !dev {
+			return echo.Start(address)
+		}
 		parts := strings.Split(address, ":")
 		originalPort, err := strconv.Atoi(parts[len(parts)-1])
 		newPort := originalPort - 1
@@ -43,12 +46,20 @@ func RunRegister(echo *echo.Echo) func(address string) error {
 //	app.Use(middlewares.Htmx())
 //	app.Use(middlewares.Interceptor())
 //	app.Run(":3000")
-func New() *types.Goyard {
+func Begin(dev bool) *types.Goyard {
 	echo := echo.New()
 	echo.HidePort = true
 	echo.HideBanner = true
 	echo.Use(controller.Initialize())
-	return &types.Goyard{Echo: echo, Run: RunRegister(echo)}
+	return &types.Goyard{Echo: echo, Run: RunRegister(echo, false)}
+}
+
+func New() *types.Goyard {
+	return Begin(false)
+}
+
+func Dev() *types.Goyard {
+	return Begin(true)
 }
 
 func Page(page templ.Component) echo.HandlerFunc {
