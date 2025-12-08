@@ -2,6 +2,7 @@
 
 **Version: 1.0.0**
 
+
 Goyard is a modern, lightweight Go web framework built on top of Echo v4, designed for rapid development of server-side rendered applications with HTMX support, automatic validation, and seamless templ template integration.
 
 ## Table of Contents
