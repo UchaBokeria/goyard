@@ -3,7 +3,6 @@
 package controller
 
 import (
-	"fmt"
 	"net/http"
 	"reflect"
 	"regexp"
@@ -25,7 +24,6 @@ func Data[T any](ctx *Context, key string) T {
 
 // Initialize returns a middleware that swaps echo.Context with our extended Context.
 func Initialize() echo.MiddlewareFunc {
-	fmt.Println("Goyard Initialized")
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			ctx := &Context{Context: c}

@@ -63,7 +63,6 @@ func Dev() *types.Goyard {
 }
 
 func Page(page templ.Component) echo.HandlerFunc {
-	// a
 	return controller.Set[any](func(ctx *controller.Context) error {
 		return ctx.Html(page)
 	})
