@@ -138,6 +138,7 @@ func (ctx *Context) HtmlWithStatus(code int, c templ.Component) error {
 	if ctx.IsHtmx() {
 		var htmxBase templ.Component
 		wrapper, ok := ctx.Get("LayoutRenderHtmx").(func(c templ.Component) templ.Component)
+
 		if wrapper != nil && ok {
 			htmxBase = wrapper(c)
 		} else {
