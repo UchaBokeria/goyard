@@ -136,7 +136,14 @@ func (ctx *Context) Html(c templ.Component) error {
 // If the request is an HTMX request we render only the fragment.
 func (ctx *Context) HtmlWithStatus(code int, c templ.Component) error {
 	if ctx.IsHtmx() {
-		return c.Render(ctx.Request().Context(), ctx.Response())
+		var htmxBase templ.Component
+		wrapper, ok := ctx.Get("LayoutRenderHtmx").(func(c templ.Component) templ.Component)
+		if wrapper != nil && ok {
+			htmxBase = wrapper(c)
+		} else {
+			htmxBase = c
+		}
+		return htmxBase.Render(ctx.Request().Context(), ctx.Response())
 	}
 
 	var base templ.Component
